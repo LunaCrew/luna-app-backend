@@ -1,35 +1,69 @@
-import { connect } from 'mongoose'
-import express, { Request, Response } from 'express'
-import Logger from './util/log/Logger'
-import HttpStatusCode from './util/enum/HttpStatusCode'
+import express, { Application } from 'express'
+import { MongoClient, ServerApiVersion } from 'mongodb'
+import cors from 'cors'
+import Log from '@lunacrew/logger'
 import * as dotenv from 'dotenv'
+import passport from 'passport'
+import { routes } from './router/routes'
+import { errorHandler } from './middleware/errorHandler'
+import configurePassport from './util/security/Passport'
+
 dotenv.config({ path: '.env' })
 
-const PORT = process.env.PORT || 3000
-const app: express.Application = express()
+const PORT = process.env.PORT ?? 3000
+const app: Application = express()
 
-try {
-  app.get('/', (_req: Request, res: Response) => {
-    res.status(parseInt(HttpStatusCode.OK)).json({
-      server: 'Luna App',
-      status: 'OK'
+routes(app)
+
+export const client = new MongoClient(process.env.DB_URI as string, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+})
+
+const start = () => {
+  try {
+    configurePassport(passport)
+
+    const corsOptions = {
+      origin: '',
+      methods: '',
+      allowedHeaders: 'Content-Type'
+    }
+
+    app
+      .use(cors(corsOptions))
+      .use(passport.initialize())
+      .use(errorHandler)
+
+    app.listen(PORT, () => {
+      Log.d(`Running at http://localhost:${PORT}`, 'Server')
     })
-  })
-} catch (error) {
-  Logger.error(':: App :: Base URL ::', error)
+
+  } catch (error) {
+    Log.e(`${error}`, 'Error starting server')
+  }
 }
 
-try {
-  app.listen(PORT, () => {
-    Logger.success(`:: Server runing on port ${PORT} ::`)
-  })
-} catch (error) {
-  Logger.error(':: App :: Start server ::', error)
+const connect = async () => {
+  try {
+    await client.connect()
+    await client.db().command({ ping: 1 })
+    Log.d('Connected', 'MongoDB')
+  } catch (error) {
+    await client.close()
+    Log.e(`${error}`, 'MongoDB Connection')
+  }
 }
 
-try {
-  connect(process.env.DB_URI || '', { dbName: 'lunateam-dev' })
-  Logger.success(':: Database connected with success ::')
-} catch (error) {
-  Logger.error(':: Config :: DbConnect ::', error)
+const collections = {
+  users: client.db().collection('users')
 }
+
+export { collections }
+export default app
+
+start()
+connect()

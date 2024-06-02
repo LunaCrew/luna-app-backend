@@ -20,3 +20,12 @@ jobs:
 
     - name: Run Jest tests
       run: npx jest --verbose ./test/unit/ --coverage
+
+    - name: Publish coverage report
+      uses: MishaKav/jest-coverage-comment@main
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        coverage-summary-path: ./coverage/coverage-summary.json
+        title: Coverage Report
+        remove-links-to-files: false
+        remove-links-to-lines: true

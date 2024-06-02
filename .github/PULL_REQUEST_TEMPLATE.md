@@ -1,14 +1,12 @@
 # Technical Checklist
 
-- [ ] Title describes what has been made.
-- [ ] All files created have unit tests (when applicable).
-- [ ] All created flows have integration tests.
-- [ ] Swagger has been updated.
-- [ ] Test coverage reached or exceeded 90%.
-- [ ] When I finished the task, I moved my card to the **review** column.
-
-> **⚠️ Be careful with sensitive files and information, no secret information should be sent to github, such as:** `.npmrc`, `secrets`, `passwords`, `connection strings`.
+- [ ] **Code Review**: I have reviewed my own code and ensured that it is clean and readable.
+- [ ] **Testing**: I have tested my code and ensured that it works as expected.
+- [ ] **Documentation**: I have updated the documentation to reflect the changes made in this PR.
+- [ ] **Dependencies**: I have ensured that all dependencies are up-to-date.
+- [ ] **Security**: I have ensured that my code is secure and does not introduce any vulnerabilities.
+- [ ] **Performance**: I have ensured that my code is performant and does not introduce any bottlenecks.
 
 ## Additional Notes
 
-> This Pull Request successfully closes #\<issue\>
+This Pull Request successfully closes `#ISSUE`
